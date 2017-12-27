@@ -33,7 +33,7 @@ public class BlockingQueueTest {
 	private static final boolean CUSTOM = false;
 	private static final PrintStream stdOut = System.out;
 
-	private static volatile boolean done; 
+	private static volatile boolean done;
 	private static long startTime;
 
 
@@ -41,12 +41,12 @@ public class BlockingQueueTest {
 
 		if (!USE_DEFAULT_VALUES) {
 			promptUserForInput();
-		}		
+		}
 
 		changeOutputSource(CUSTOM);
 
 		//////////////////////// I. AtomicInteger benchmark ///////////////////////////////
-		startTimer();	
+		startTimer();
 		Counters.AtomicIntegerCounter atomicCounter = new Counters.AtomicIntegerCounter();
 
 		startFileEnumerationThread(directory);
@@ -58,7 +58,7 @@ public class BlockingQueueTest {
  		endTimerAndPrintExecutionTime("using AtomicInteger");
 
  		//////////////////////// II. LongAdder benchmark ///////////////////////////////
- 		startTimer();	
+ 		startTimer();
 		Counters.LongAdderCounter longAdderCounter = new Counters.LongAdderCounter();
 
 		startFileEnumerationThread(directory);
@@ -101,7 +101,7 @@ public class BlockingQueueTest {
 
 	private static void changeOutputSource(boolean isStandard) {
 		try {
-			PrintStream stream = isStandard ? stdOut : 
+			PrintStream stream = isStandard ? stdOut :
 				new PrintStream(new FileOutputStream(OUTPUT_FILENAME), true, ENCODING);
 			System.setOut(stream);
 		} catch (UnsupportedEncodingException e) {
@@ -134,7 +134,7 @@ public class BlockingQueueTest {
 			for (File singleFileFromList : fileList) {
 				changeOutputSource(CUSTOM);
 				System.out.println("File read: " + singleFileFromList);
-				readAndRememberFiles(singleFileFromList);	
+				readAndRememberFiles(singleFileFromList);
 			}
 		} else {
 			fileQueue.put(file);
@@ -211,4 +211,4 @@ public class BlockingQueueTest {
 			System.out.println("File not found : " + file);
 		}
 	}
-} 
+}
