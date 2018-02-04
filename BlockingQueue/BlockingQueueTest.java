@@ -18,7 +18,7 @@ public class BlockingQueueTest {
 	private static final String OUTPUT_FILENAME = BlockingQueueTest.class.getSimpleName() + "Result.txt";
 	private static final String ENCODING = "UTF-8";
 
-	private static final String DIRECTORY = "D:\\Docs [Work and study]\\Horstmann Java 8\\BlockingQueue\\benchmark_texts";
+	private static final String DIRECTORY = "\\benchmark_texts";
 	private static final String KEYWORD = "человек";
 	private static String directory = USE_DEFAULT_VALUES ? DIRECTORY : "";
 	private static String keyword = USE_DEFAULT_VALUES ? KEYWORD : "";
