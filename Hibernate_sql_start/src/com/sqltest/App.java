@@ -10,10 +10,13 @@ public class App {
 
         javax.xml.bind.JAXBException exception;
 
-        try (SessionFactory factory = new Configuration()
+        SessionFactory factory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(Student.class)
-                .buildSessionFactory()) {
+                .buildSessionFactory();
+
+        try {
+
 
             Session session = factory.getCurrentSession();
 
@@ -23,10 +26,10 @@ public class App {
             session.save(st);
             session.getTransaction().commit();
 
+ //       }
+        } finally {
+            factory.close();
         }
-//        } finally {
-//            factory.close();
-//        }
 
 
 
