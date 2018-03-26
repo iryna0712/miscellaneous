@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test page</title>
+
+  <style>
+    #idLabel {
+      margin-left: 100px;
+    }
+
+  </style>
+
+  <script type="text/javascript">
+
+    addEventListener('click', processClick);
+
+    function processClick(evt) {
+      alert(evt);
+    }
+
+    addEventListener('click', function(evt) {
+      alert('wow');
+    });
+
+    window.onclick = function(evt) {
+      alert('click click');
+    };
+
+    addEventListener('mousemove', function(evt) {
+      var labelElement = document.querySelector("#idLabel");
+      labelElement.innerHTML='X coordinate of mouse : ' + evt.clientX + ' ' + evt.pageX;
+    });
+
+
+  </script>
+</head>
+<body>
+  <h1>Some page text</h1>
+
+  <label id='idLabel'>Mouse coodinates appear here</label >
+
+<!--   <div id="background">
+    <div id="theDiv">
+
+    </div>
+  </div>
+   <p>Here is the Mario sprite sheet image used in this example:</p>
+  <img src="https://mainline.i3s.unice.fr/mooc/marioSprite.png"  alt="mario picture"> -->
+</body>
+</html>

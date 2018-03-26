@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>JavaScript can change CSS properties on the fly</title>
+
+  <style>
+    body {
+      margin: 100px;
+    }
+
+    #background {
+      width:1000px;
+      height: 600px;
+      background-image: url('http://backgroundcheckall.com/wp-content/uploads/2017/12/8bit-background-2.png');
+      background-size: cover;
+    }
+
+    #theDiv {
+      width:105px;
+      height:33px;
+      margin-top: 80px;
+      display: inline-block;
+    }
+  </style>
+
+  <script type="text/javascript">
+    var divElem;
+
+    function init() {
+      console.log("page loaded and DOM is ready");
+
+      // use the selection API to select the div
+      divElem = document.querySelector("#theDiv");
+
+      startContinuousAnimation();
+    }
+
+    var currentImage = 0;
+    var leftPos = 0;
+
+    function startContinuousAnimation() {
+       setInterval(animateMario, 100);
+    }
+
+    function animateMario() {
+      drawMario(currentImage);
+
+      // next time, show next sprite/subimage
+      currentImage = (currentImage +1) % 3;
+      // next time, move mario 5 pixels to the right
+      leftPos += 5;
+      console.log(leftPos);
+
+      // And if he moved 100 pixels, start back from the left
+      if(leftPos >= 1000)
+        leftPos = 0;
+    }
+
+    function drawMario(indexImage) {
+      // set the left pos of the div using the left margin
+      divElem.style.marginLeft = leftPos + "px";
+      divElem.style.marginTop = 430 + "px";
+      // change the width and height of the div
+      divElem.style.width = "42px";
+      divElem.style.height = "64px";
+      // remove the text inside the div
+      divElem.innerHTML = "";
+      // set the background image
+      divElem.style.backgroundImage = "url(https://mainline.i3s.unice.fr/mooc/marioSprite.png)";
+      divElem.style.backgroundSize = "cover"
+      // remove the background color
+      divElem.style.backgroundColor = "transparent";
+      // select the starting pos in the background image
+      var offset = indexImage * 48 - 1;
+      divElem.style.backgroundPosition  = offset + "px";
+
+    }
+
+  </script>
+</head>
+<body onload="init();">
+
+  <div id="background">
+    <div id="theDiv">
+
+    </div>
+  </div>
+   <p>Here is the Mario sprite sheet image used in this example:</p>
+  <img src="https://mainline.i3s.unice.fr/mooc/marioSprite.png"  alt="mario picture">
+</body>
+</html>

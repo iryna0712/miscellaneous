@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Plotting functions in JavaScript using the function plot library</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.6.1/spectrum.min.css">
+
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.0/spectrum.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="https://mauriciopoppe.github.io/function-plot/js/function-plot.js"></script>
+
+    <style type="text/css">
+
+      section {
+        border: 6px solid darkred;
+        border-radius: 15px;
+        box-shadow: 5px 5px 5px grey;
+        float:left;
+        height:360px;
+        padding: 20px;
+        margin:10px;
+      }
+
+      #plotSettings {
+        width:150px;
+      }
+
+      #plot {
+        width:550px;
+      }
+
+      h2 {
+        margin-left: 15px;
+      }
+
+    </style>
+
+    <script>
+      var parameters = {
+        target: '#myFunction',
+        data: [{fn: 'sin(x)', color: 'red'}],
+        grid: true,
+        yAxis: {domain: [-1, 1]},
+        xAxis: {domain: [0, 2 * Math.PI]},
+      };
+
+      function plot() {
+        var xMin = document.querySelector("#xMin").value;
+        var xMax = document.querySelector("#xMax").value;
+        var yMin = document.querySelector("#yMin").value;
+        var yMax = document.querySelector("#yMax").value;
+
+
+        var color = document.querySelector("#color").value;
+        parameters.data[0].color = color;
+        var fn = document.querySelector("#function").value;
+        parameters.data[0].fn = fn;
+
+        parameters.xAxis.domain = [xMin, xMax];
+        parameters.yAxis.domain = [yMin, yMax];
+
+        functionPlot(parameters);
+
+        alert("Wow!!! Parts of the city of Miami are under water as Hurricane Irma heads for mainland Florida, triggering storm surges across the south of the state. Irma was downgraded to a category three storm at 1900 GMT, but made landfall on Marco Island off Florida's west coast with winds of up to 120mph (192km/h).");
+      }
+
+    </script>
+</head>
+
+<body onload="plot();">
+
+    <h2>Interactive function flotter</h2>
+
+    <section id="plotSettings">
+      <label for="function">Function to plot: </label>
+      <input id="function" type="text" value="sin(x)"
+                    onchange="plot();">
+      <p></p>
+      <label for="xMin">xMin: </label>
+      <input type=number id="xMin" value=0 step=0.5
+                    oninput="plot();">
+      <p></p>
+
+      <label for="xMax">xMax: </label>
+      <input type=number id="xMax" value=6.28 step=0.5
+                    oninput="plot();">
+
+      <p></p>
+
+      <label for="yMin">yMin: </label>
+      <input type=number id="yMin" value=-1 step=0.5
+                    oninput="plot();">
+      <p></p>
+
+      <label for="yMax">yMax: </label>
+      <input type=number id="yMax" value=1 step=0.5
+                    oninput="plot();">
+      <p></p>
+
+      <label for="color">Color: </label>
+      <input type=color id="color"
+                    onchange="plot();">
+
+      <p></p>
+
+
+      <button onclick="plot();">Plot it!</button>
+
+    </section>
+
+
+    <section id="plot">
+      <div id="myFunction"></div>
+    </section>
+
+</body>
+</html>
