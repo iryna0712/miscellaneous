@@ -1,0 +1,116 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+        #rating-container {
+            position: absolute;
+        }
+
+        #background-animation-container {
+            position: absolute;
+        }
+
+
+        body {
+            background-color: lightgrey;
+            font-family: Verdana;
+        }
+        h1, h2, h3 {
+            color: darkblue;
+        }
+        .rating-circle {
+            width: 2.2em;
+            height: 2.2em;
+            border: .2em solid black;
+            border-radius: 1.1em;
+            display: inline-block;
+
+            /*padding: .1em;*/
+            /*background-color: transparent;*/
+            /*position: relative;*/
+            overflow: hidden
+        }
+
+        .rating-circle-background {
+            width: 100%;
+            height: 100%;
+
+            /*left: 0;*/
+            /*right: 0;*/
+            /*top: 0;*/
+            /*padding:0;*/
+
+            background-color: yellow;
+            /*padding: inherit;*/
+            /*position: absolute;*/
+        }
+
+        .rating-chosen {
+            background-color: green;
+        }
+
+    </style>
+
+    <script>
+        $(function() {
+            $('#circle_1').hide();
+        })
+    </script>
+</head>
+<body>
+<h1>Contoso Web Developer Conference</h1>
+<h2>Finding elements using jQuery</h2>
+<div>This session is about identifying elements using jQuery methods and selectors.</div>
+<h3>Rate this session</h3>
+
+<div id="rating-container">
+    <div id='circle_1' class="rating-circle">
+        <div class="rating-circle-background"></div>
+    </div>
+    <div class="rating-circle">
+        <div class="rating-circle-background"></div>
+    </div>
+    <div class="rating-circle">
+        <div class="rating-circle-background"></div>
+    </div>
+    <div class="rating-circle">
+        <div class="rating-circle-background"></div>
+    </div>
+    <div class="rating-circle">
+        <div class="rating-circle-background"></div>
+    </div>
+</div>
+
+
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+
+<script>
+
+    $('.rating-circle').mouseenter(function (event) {
+        //$('#background_1').animate({width: '100%'}, 1000);
+
+        var nextNode = $(this).next();
+
+        nextNode.prevAll().children().addClass('rating-chosen');
+        //children().first().addClass('rating-chosen');
+        //children().first().animate({width: '100%'}, 1000);
+
+        //$(this).children().first().animate({width: '100%'}, 1000);
+        //event.target.firstChild().
+    })
+
+    $('.rating-circle').click(function () {
+        $('.rating-circle-background').addClass('rating-chosen');
+
+        //
+        //$('#circle_1').addClass('rating-hover');
+        //$('#circle_1').slideDown(2000);
+        //$('#circle_1').addClass('rating-hover');
+    })
+
+    //$('#circle_1').animate()
+</script>
+</body>
+</html>
