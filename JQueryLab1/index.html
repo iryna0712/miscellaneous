@@ -32,7 +32,7 @@
         }
 
         .rating-circle-background {
-            width: 100%;
+            width: 0%;
             height: 100%;
 
             /*left: 0;*/
@@ -93,13 +93,54 @@
 
         var nextNode = $(this).next();
 
-        nextNode.prevAll().children().addClass('rating-chosen');
+        //nextNode.prevAll().children().addClass('rating-chosen');
+
+        var node = $('#rating-container').children().first();
+        //animateSequentialSlideRight(nextNode.prevAll(), nextNode);
+
+        //var animatedObject = animatedCircles.first();
+        animateObject(node, nextNode);
+
         //children().first().addClass('rating-chosen');
         //children().first().animate({width: '100%'}, 1000);
 
         //$(this).children().first().animate({width: '100%'}, 1000);
         //event.target.firstChild().
     })
+
+    function animateObject(animatedobject, until) {
+        //alert('animate');
+
+        animatedobject.children().first().animate({width: '100%'}, 150, function () {
+            //alert('finished!');
+
+            var nextobject = animatedobject.next();
+            if (nextobject !== until) {
+                animateObject(nextobject, until);
+            }
+        });
+    }
+    
+    function animateSequentialSlideRight(animatedCircles, until) {
+        //if (animatedCircles !== null) {
+            var animatedObject = animatedCircles.first();
+            animatedObject.children().first().animate({width: '100%'}, 1000, animateSequentialSlideRight($(this).nextUntil(until)));
+        //}
+        // alert("wow1");
+        // var index = 0;
+        // var doContinue = true;
+        // while (doContinue) {
+        //     var promise = animatedCircles[index].children().first().animate({width: '100%'}, 1000);
+        //     alert("wow");
+        //     promise.done(function () {
+        //         if (index === animatedCircles.length) {
+        //             doContinue = false;
+        //         } else {
+        //             ++index;
+        //         }
+        //     });
+        // }
+    }
 
     $('.rating-circle').click(function () {
         $('.rating-circle-background').addClass('rating-chosen');
