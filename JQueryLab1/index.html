@@ -1,157 +1,157 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-        #rating-container {
-            position: absolute;
-        }
-
-        #background-animation-container {
-            position: absolute;
-        }
-
-
-        body {
-            background-color: lightgrey;
-            font-family: Verdana;
-        }
-        h1, h2, h3 {
-            color: darkblue;
-        }
-        .rating-circle {
-            width: 2.2em;
-            height: 2.2em;
-            border: .2em solid black;
-            border-radius: 1.1em;
-            display: inline-block;
-
-            /*padding: .1em;*/
-            /*background-color: transparent;*/
-            /*position: relative;*/
-            overflow: hidden
-        }
-
-        .rating-circle-background {
-            width: 0%;
-            height: 100%;
-
-            /*left: 0;*/
-            /*right: 0;*/
-            /*top: 0;*/
-            /*padding:0;*/
-
-            background-color: yellow;
-            /*padding: inherit;*/
-            /*position: absolute;*/
-        }
-
-        .rating-chosen {
-            background-color: green;
-        }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
     <script>
+        var areEventsEnabled = false;
+        var animationToLeftCancelled = false;
+        var animationToRightCancelled = false;
+
         $(function() {
-            $('#circle_1').hide();
-        })
+            toggleEventProcessing();
+        });
+
+        /* used to disable/enable event processing before/after animation */
+        function toggleEventProcessing() {
+            if (!areEventsEnabled) {
+                $('.rating-circle').on('mouseenter', animateNodesToTheRight);
+                $('.rating-circle').on('mouseleave', animateNodesToTheLeft);
+                $('.rating-circle').on('click', changeColor);
+
+            } else {
+                $('.rating-circle').off();
+            }
+
+            areEventsEnabled = !areEventsEnabled;
+        }
+
+        function reset() {
+            $('.rating-circle').stop(true,true);
+
+            $('.rating-circle').data('animationToLeftFinished', 'false');
+            $('.rating-circle').data('animationToRightFinished', 'false');
+        }
+
+        function animateNodesToTheLeft(event) {
+            //event.stopPropagation();
+            animationToRightCancelled = true;
+            animationToLeftCancelled = false;
+
+            console.log('animate to left');
+            reset();
+
+            var parentNode = $('#rating-container');
+            var untilNode = parentNode.children(':first');
+            var animatedNode = $(this);
+
+            animateSequentiallyToTheLeft(animatedNode, untilNode, parentNode);
+        }
+
+        function animateNodesToTheRight(event) {
+            //event.stopPropagation();
+            animationToLeftCancelled = true;
+            animationToRightCancelled = false;
+
+            console.log('animate to right');
+            reset();
+
+            //toggleEventProcessing();
+
+            var parentNode = $('#rating-container');
+            var untilNode = $(this);
+            var animatedNode = parentNode.children(':first');
+
+            animateSequentiallyToTheRight(animatedNode, untilNode, parentNode);
+        }
+
+        function animateSequentiallyToTheLeft(animated, until, parent) {
+            console.log('animateSequentiallyToTheLeft');
+
+            var wasUntilReached = parent.children().index(animated) < parent.children().index(until) ;
+            var wasOverflowReached = (parent.children().index(animated) === -1);
+
+            //console.log("wasUntilReached " + wasUntilReached);
+            //console.log("wasOverflowReached " + wasOverflowReached);
+
+            if (animationToLeftCancelled || wasUntilReached || wasOverflowReached ) {
+                //toggleEventProcessing();
+                return;
+            }
+
+            //skip animation if the element was already animated before
+            var duration =  animated.data('animationToLeftFinished') === 'true' ? 0 : 185;
+
+            animated.children(':first').animate(
+                {width: '0%'},
+                duration,
+                'linear',
+                function () {
+                    animated.data('animationToLeftFinished', 'true');
+
+                    animateSequentiallyToTheLeft(animated.prev(), until, parent);
+                });
+        }
+
+        //this method is more or less general without referring to specific tags
+        function animateSequentiallyToTheRight(animated, until, parent) {
+            console.log('animateSequentiallyToTheRight');
+
+            var wasUntilReached = parent.children().index(animated) > parent.children().index(until) ;
+            var wasOverflowReached = (parent.children().index(animated) === -1);
+
+            if (animationToRightCancelled || wasUntilReached || wasOverflowReached ) {
+                //toggleEventProcessing();
+                return;
+            }
+
+            //skip animation if the element was already animated before
+            var duration =  animated.data('animationToRightFinished') === 'true' ? 0 : 185;
+
+            animated.children(':first').animate(
+                {width: '100%'},
+                duration,
+                'linear',
+                function () {
+                    animated.data('animationToRightFinished', 'true');
+
+                    animateSequentiallyToTheRight(animated.next(), until, parent);
+                });
+        }
+
+        function changeColor() {
+            $('.rating-circle-background').addClass('rating-chosen');
+        }
+
+
     </script>
 </head>
 <body>
-<h1>Contoso Web Developer Conference</h1>
-<h2>Finding elements using jQuery</h2>
-<div>This session is about identifying elements using jQuery methods and selectors.</div>
-<h3>Rate this session</h3>
+    <h1>Contoso Web Developer Conference</h1>
+    <h2>Finding elements using jQuery</h2>
+    <div>This session is about identifying elements using jQuery methods and selectors.</div>
+    <h3>Rate this session</h3>
 
-<div id="rating-container">
-    <div id='circle_1' class="rating-circle">
-        <div class="rating-circle-background"></div>
+    <!-- this section can be created dynamically, change this if it is covered in the next modules -->
+    <div id="rating-container">
+        <div class="rating-circle">
+            <div class="rating-circle-background"></div>
+        </div>
+        <div class="rating-circle">
+            <div class="rating-circle-background"></div>
+        </div>
+        <div class="rating-circle">
+            <div class="rating-circle-background"></div>
+        </div>
+        <div class="rating-circle">
+            <div class="rating-circle-background"></div>
+        </div>
+        <div class="rating-circle">
+            <div class="rating-circle-background"></div>
+        </div>
     </div>
-    <div class="rating-circle">
-        <div class="rating-circle-background"></div>
-    </div>
-    <div class="rating-circle">
-        <div class="rating-circle-background"></div>
-    </div>
-    <div class="rating-circle">
-        <div class="rating-circle-background"></div>
-    </div>
-    <div class="rating-circle">
-        <div class="rating-circle-background"></div>
-    </div>
-</div>
 
-
-<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
-
-<script>
-
-    $('.rating-circle').mouseenter(function (event) {
-        //$('#background_1').animate({width: '100%'}, 1000);
-
-        var nextNode = $(this).next();
-
-        //nextNode.prevAll().children().addClass('rating-chosen');
-
-        var node = $('#rating-container').children().first();
-        //animateSequentialSlideRight(nextNode.prevAll(), nextNode);
-
-        //var animatedObject = animatedCircles.first();
-        animateObject(node, nextNode);
-
-        //children().first().addClass('rating-chosen');
-        //children().first().animate({width: '100%'}, 1000);
-
-        //$(this).children().first().animate({width: '100%'}, 1000);
-        //event.target.firstChild().
-    })
-
-    function animateObject(animatedobject, until) {
-        //alert('animate');
-
-        animatedobject.children().first().animate({width: '100%'}, 150, function () {
-            //alert('finished!');
-
-            var nextobject = animatedobject.next();
-            if (nextobject !== until) {
-                animateObject(nextobject, until);
-            }
-        });
-    }
-    
-    function animateSequentialSlideRight(animatedCircles, until) {
-        //if (animatedCircles !== null) {
-            var animatedObject = animatedCircles.first();
-            animatedObject.children().first().animate({width: '100%'}, 1000, animateSequentialSlideRight($(this).nextUntil(until)));
-        //}
-        // alert("wow1");
-        // var index = 0;
-        // var doContinue = true;
-        // while (doContinue) {
-        //     var promise = animatedCircles[index].children().first().animate({width: '100%'}, 1000);
-        //     alert("wow");
-        //     promise.done(function () {
-        //         if (index === animatedCircles.length) {
-        //             doContinue = false;
-        //         } else {
-        //             ++index;
-        //         }
-        //     });
-        // }
-    }
-
-    $('.rating-circle').click(function () {
-        $('.rating-circle-background').addClass('rating-chosen');
-
-        //
-        //$('#circle_1').addClass('rating-hover');
-        //$('#circle_1').slideDown(2000);
-        //$('#circle_1').addClass('rating-hover');
-    })
-
-    //$('#circle_1').animate()
-</script>
 </body>
 </html>

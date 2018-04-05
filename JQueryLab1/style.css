@@ -1,0 +1,31 @@
+body {
+    background-color: lightgrey;
+    font-family: Verdana;
+}
+
+h1, h2, h3 {
+    color: darkblue;
+}
+
+.rating-circle {
+    width: 2.2em;
+    height: 2.2em;
+    border: .2em solid black;
+    border-radius: 1.1em;
+    display: inline-block;
+    overflow: hidden
+}
+
+.rating-circle-background {
+    width: 0%;
+    height: 100%;
+    background-color: yellow;
+}
+
+.rating-chosen {
+    background-color: green;
+}
+
+.animation-completed {
+
+}
