@@ -1,14 +1,56 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <style>
+        body {
+            background-color: lightgrey;
+            font-family: Verdana;
+        }
+
+        h1, h2, h3 {
+            color: darkblue;
+        }
+
+        .rating-circle {
+            width: 2.2em;
+            height: 2.2em;
+            border: .2em solid black;
+            border-radius: 1.1em;
+            display: inline-block;
+            overflow: hidden
+        }
+
+        .rating-circle-background {
+            width: 0%;
+            height: 100%;
+        }
+
+        .rating-chosen {
+            background-color: green;
+        }
+
+        .rating-hover {
+            background-color: yellow;
+        }
+    </style>
+
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
     <script>
-        var areEventsEnabled = false;
+        /* animationToLeftCancelled and animationToRightCancelled flags that are needed to interrupt animation */
+        /* for example, nodes are animated to the right sequentially, but we move mouse to the left, so */
+        /* the animateSequentiallyToTheRight() method needs to check whether to continue animation. flag
+        /* animationToRightCancelled will help with this */
         var animationToLeftCancelled = false;
         var animationToRightCancelled = false;
+
+        /* obj.is(':animated') does not work for some reason, so simple flag is used */
+        var anyObjectAnimated = false;
+
+        var ratingSaved = false;
+        var indexChosen = -1;
 
         $(function() {
             toggleEventProcessing();
@@ -16,115 +58,156 @@
 
         /* used to disable/enable event processing before/after animation */
         function toggleEventProcessing() {
-            if (!areEventsEnabled) {
-                $('.rating-circle').on('mouseenter', animateNodesToTheRight);
-                $('.rating-circle').on('mouseleave', animateNodesToTheLeft);
-                $('.rating-circle').on('click', changeColor);
+            $('.rating-circle').on('mouseenter', animateChoice);
+            $('.rating-circle').on('click', saveRating);
+
+            $('#rating-container').on('mouseleave', clearAllOrFillRating);
+        }
+
+        function clearAllOrFillRating() {
+            if (ratingSaved) {
+                $('.rating-circle').each(function(index) {
+
+                    if (index <= indexChosen) {
+                        $(this).data('animationToLeftFinished', 'false');
+                        $(this).data('animationToRightFinished', 'true');
+                        $(this).children(':first').css('width', '100%');
+                    } else {
+                        $(this).data('animationToLeftFinished', 'true');
+                    }
+                });
+
+                /* change color */
+                $('.rating-circle-background').removeClass('rating-hover');
+                $('.rating-circle-background').addClass('rating-chosen');
 
             } else {
-                $('.rating-circle').off();
+                $('.rating-circle').data('animationToLeftFinished ', 'false');
+
+                var chosenNode = $($('#rating-container').children().get(indexChosen));
+                resetAndAnimateNodesToTheLeft(chosenNode);
             }
 
-            areEventsEnabled = !areEventsEnabled;
         }
 
-        function reset() {
+        function animateChoice() {
+            /* change color */
+            $('.rating-circle-background').removeClass('rating-chosen');
+            $('.rating-circle-background').addClass('rating-hover');
+
+            animationToLeftCancelled = true;
+            animationToRightCancelled = true;
+
+            var chosenNode = $(this);
+            var isCurrentNodeFilled = chosenNode.data('animationToRightFinished') === 'true';
+            var isNextNodeFilled = chosenNode.next().data('animationToRightFinished') === 'true';
+
+            if (isCurrentNodeFilled && isNextNodeFilled) {
+                var animatedNode = chosenNode;
+
+                //find last filled node
+                while (animatedNode.next().index() !== -1 && animatedNode.next().data('animationToRightFinished') === 'true') {
+                    animatedNode = animatedNode.next();
+                }
+
+                resetAndAnimateNodesToTheLeft(animatedNode, chosenNode.next());
+            } else {
+
+                //if we point mouse to the element that was not filled yet, animate it and all nodes before it
+                resetAndAnimateNodesToTheRight(chosenNode);
+            }
+
+        }
+
+        function resetAndAnimateNodesToTheLeft(animatedNodeThis, untilNodeThis) {
+
             $('.rating-circle').stop(true,true);
-
-            $('.rating-circle').data('animationToLeftFinished', 'false');
-            $('.rating-circle').data('animationToRightFinished', 'false');
-        }
-
-        function animateNodesToTheLeft(event) {
-            //event.stopPropagation();
             animationToRightCancelled = true;
             animationToLeftCancelled = false;
 
-            console.log('animate to left');
-            reset();
+            //if no until node is provided, animate to the very first one
+            var untilNode = (untilNodeThis === undefined) ? $('#rating-container').children(':first') : untilNodeThis;
+            var animatedNode = animatedNodeThis;
 
-            var parentNode = $('#rating-container');
-            var untilNode = parentNode.children(':first');
-            var animatedNode = $(this);
-
-            animateSequentiallyToTheLeft(animatedNode, untilNode, parentNode);
+            animateSequentiallyToTheLeft(animatedNode, untilNode);
         }
 
-        function animateNodesToTheRight(event) {
-            //event.stopPropagation();
+        function resetAndAnimateNodesToTheRight(animatedNodeThis) {
+
+            $('.rating-circle').stop(true,true);
             animationToLeftCancelled = true;
             animationToRightCancelled = false;
 
-            console.log('animate to right');
-            reset();
-
-            //toggleEventProcessing();
-
             var parentNode = $('#rating-container');
-            var untilNode = $(this);
+            var untilNode = animatedNodeThis;
             var animatedNode = parentNode.children(':first');
 
-            animateSequentiallyToTheRight(animatedNode, untilNode, parentNode);
+            animateSequentiallyToTheRight(animatedNode, untilNode);
         }
 
-        function animateSequentiallyToTheLeft(animated, until, parent) {
-            console.log('animateSequentiallyToTheLeft');
-
-            var wasUntilReached = parent.children().index(animated) < parent.children().index(until) ;
-            var wasOverflowReached = (parent.children().index(animated) === -1);
-
-            //console.log("wasUntilReached " + wasUntilReached);
-            //console.log("wasOverflowReached " + wasOverflowReached);
+        //method is more or less general without referring to specific tags
+        function animateSequentiallyToTheLeft(animated, until) {
+            var wasUntilReached = animated.index() < until.index();
+            var wasOverflowReached = animated.index() === -1;
 
             if (animationToLeftCancelled || wasUntilReached || wasOverflowReached ) {
-                //toggleEventProcessing();
                 return;
             }
 
             //skip animation if the element was already animated before
             var duration =  animated.data('animationToLeftFinished') === 'true' ? 0 : 185;
 
+            anyObjectAnimated = true;
             animated.children(':first').animate(
                 {width: '0%'},
                 duration,
                 'linear',
                 function () {
                     animated.data('animationToLeftFinished', 'true');
+                    animated.data('animationToRightFinished', 'false');
 
-                    animateSequentiallyToTheLeft(animated.prev(), until, parent);
+                    anyObjectAnimated = false;
+                    animateSequentiallyToTheLeft(animated.prev(), until);
                 });
         }
 
-        //this method is more or less general without referring to specific tags
-        function animateSequentiallyToTheRight(animated, until, parent) {
-            console.log('animateSequentiallyToTheRight');
-
-            var wasUntilReached = parent.children().index(animated) > parent.children().index(until) ;
-            var wasOverflowReached = (parent.children().index(animated) === -1);
+        //method is more or less general without referring to specific tags
+        function animateSequentiallyToTheRight(animated, until) {
+            var wasUntilReached = animated.index() > until.index();
+            var wasOverflowReached = animated.index() === -1;
 
             if (animationToRightCancelled || wasUntilReached || wasOverflowReached ) {
-                //toggleEventProcessing();
                 return;
             }
 
             //skip animation if the element was already animated before
             var duration =  animated.data('animationToRightFinished') === 'true' ? 0 : 185;
 
+            anyObjectAnimated = true;
             animated.children(':first').animate(
                 {width: '100%'},
                 duration,
                 'linear',
                 function () {
                     animated.data('animationToRightFinished', 'true');
+                    animated.data('animationToLeftFinished', 'false');
+                    anyObjectAnimated = false;
 
-                    animateSequentiallyToTheRight(animated.next(), until, parent);
+                    animateSequentiallyToTheRight(animated.next(), until);
                 });
         }
 
-        function changeColor() {
+        function saveRating() {
+            if (anyObjectAnimated) {
+                return;
+            }
+
+            ratingSaved = true;
+            indexChosen = $(this).index();
+
+            $('.rating-circle-background').removeClass('rating-hover');
             $('.rating-circle-background').addClass('rating-chosen');
         }
-
 
     </script>
 </head>
