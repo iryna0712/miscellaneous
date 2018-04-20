@@ -12,13 +12,18 @@
             color: darkblue;
         }
 
+        #user-input-area {
+            margin-top: 20px;
+        }
+
         .rating-circle {
             width: 2.2em;
             height: 2.2em;
             border: .2em solid black;
             border-radius: 1.1em;
             display: inline-block;
-            overflow: hidden
+            overflow: hidden;
+            margin-right: 2px;
         }
 
         .rating-circle-background {
@@ -42,30 +47,57 @@
         /* animationToLeftCancelled and animationToRightCancelled flags that are needed to interrupt animation */
         /* for example, nodes are animated to the right sequentially, but we move mouse to the left, so */
         /* the animateSequentiallyToTheRight() method needs to check whether to continue animation. flag
-        /* animationToRightCancelled will help with this */
+                /* animationToRightCancelled will help with this */
         var animationToLeftCancelled = false;
         var animationToRightCancelled = false;
 
         /* obj.is(':animated') does not work for some reason, so simple flag is used */
         var anyObjectAnimated = false;
-
-        var ratingSaved = false;
         var indexChosen = -1;
 
+        var circleElement = "<div class='rating-circle'><div class='rating-circle-background'></div></div>";
+
         $(function() {
+            buildWidget();
             toggleEventProcessing();
         });
 
+        function buildWidget() {
+            $('#rating-container').empty();
+
+            var numCircles = $('#rating-container').attr('max-value');
+            for (var i=0; i < numCircles; i++) {
+                $('#rating-container').append(circleElement);
+            }
+        }
+
         /* used to disable/enable event processing before/after animation */
         function toggleEventProcessing() {
-            $('.rating-circle').on('mouseenter', animateChoice);
-            $('.rating-circle').on('click', saveRating);
+            $('#rating-container').delegate('.rating-circle', 'mouseenter', animateChoice);
+            $('#rating-container').delegate('.rating-circle', 'click', saveRating);
 
             $('#rating-container').on('mouseleave', clearAllOrFillRating);
+            $('#update-max-value').on('click', resetAndUpdateMaxValue);
+        }
+
+        function resetAndUpdateMaxValue() {
+            var maxValue = $('#max-value').val();
+
+            if (maxValue > 0) {
+                animationToLeftCancelled = false;
+                animationToRightCancelled = false;
+                anyObjectAnimated = false;
+
+                indexChosen = -1;
+
+                $('#rating-container').attr('max-value', maxValue);
+
+                buildWidget();
+            }
         }
 
         function clearAllOrFillRating() {
-            if (ratingSaved) {
+            if (indexChosen !== -1) {
                 $('.rating-circle').each(function(index) {
 
                     if (index <= indexChosen) {
@@ -73,6 +105,7 @@
                         $(this).data('animationToRightFinished', 'true');
                         $(this).children(':first').css('width', '100%');
                     } else {
+                        $(this).children(':first').css('width', '0%');
                         $(this).data('animationToLeftFinished', 'true');
                     }
                 });
@@ -202,39 +235,25 @@
                 return;
             }
 
-            ratingSaved = true;
             indexChosen = $(this).index();
 
             $('.rating-circle-background').removeClass('rating-hover');
             $('.rating-circle-background').addClass('rating-chosen');
         }
-
     </script>
+
 </head>
 <body>
     <h1>Contoso Web Developer Conference</h1>
     <h2>Finding elements using jQuery</h2>
     <div>This session is about identifying elements using jQuery methods and selectors.</div>
     <h3>Rate this session</h3>
+    <div id="rating-container" max-value="5"></div>
 
-    <!-- this section can be created dynamically, change this if it is covered in the next modules -->
-    <div id="rating-container">
-        <div class="rating-circle">
-            <div class="rating-circle-background"></div>
-        </div>
-        <div class="rating-circle">
-            <div class="rating-circle-background"></div>
-        </div>
-        <div class="rating-circle">
-            <div class="rating-circle-background"></div>
-        </div>
-        <div class="rating-circle">
-            <div class="rating-circle-background"></div>
-        </div>
-        <div class="rating-circle">
-            <div class="rating-circle-background"></div>
-        </div>
+    <div id="user-input-area">
+        <label for="max-value">Enter max value:</label>
+        <input type="text" id="max-value" />
+        <button type="button" id="update-max-value">Update max value</button>
     </div>
-
 </body>
 </html>
